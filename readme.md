@@ -1,3 +1,3 @@
-# the project is under development
+# iFramework-Kernel
 
-the project is under development, and has not released a stable version.
+以 laravel 5.2.23 为基础版本
