@@ -41,6 +41,19 @@ class Builder
     }
 
     /**
+     * 增加方法 是否存在模式
+     *
+     * @param  string  $schema
+     * @return bool
+     */
+    public function hasSchema($schema)
+    {
+        $sql = 'select * from information_schema.schemata where schema_name = ?';
+
+        return count($this->connection->select($sql, [$schema])) > 0;
+    }
+
+    /**
      * Determine if the given table exists.
      *
      * @param  string  $table
@@ -48,11 +61,23 @@ class Builder
      */
     public function hasTable($table)
     {
-        $sql = $this->grammar->compileTableExists();
+        /**
+         * 修复 PostgreSQL 的 Schema::hasTable("demo.test") bug
+         */
+        if ($this->connection->getConfig('driver') == 'pgsql') {
+            $table_schema = str_before($table, '.');
+            $table_name = str_after($table, '.');
 
-        $table = $this->connection->getTablePrefix().$table;
+            $sql = 'select * from information_schema.tables where table_schema = ? and table_name = ?';
 
-        return count($this->connection->select($sql, [$table])) > 0;
+            return count($this->connection->select($sql, [$table_schema, $table_name])) > 0;
+        } else {
+            $sql = $this->grammar->compileTableExists();
+
+            $table = $this->connection->getTablePrefix().$table;
+
+            return count($this->connection->select($sql, [$table])) > 0;
+        }
     }
 
     /**
