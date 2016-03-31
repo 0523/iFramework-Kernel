@@ -1915,6 +1915,13 @@ class Builder
 
         $sql = $this->grammar->compileUpdate($this, $values);
 
+        /**
+         * 允许使用自定义函数 sql_before_update
+         */
+        if (function_exists('sql_before_update')) {
+            sql_before_update($this, $sql, $bindings);
+        }
+
         return $this->connection->update($sql, $this->cleanBindings($bindings));
     }
 
