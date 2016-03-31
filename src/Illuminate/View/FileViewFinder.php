@@ -134,6 +134,29 @@ class FileViewFinder implements ViewFinderInterface
             }
         }
 
+
+        /**
+         * 开发模式,视图文件不存在时,会在首个视图目录自动创建视图文件
+         */
+        if (env('APP_DEVELOP')) {
+            foreach ((array)$paths as $path) {
+                foreach ($this->getPossibleViewFiles($name) as $file) {
+                    if (! $this->files->exists($viewPath = $path.'/'.$file)) {
+                        if (! is_dir(dirname($viewPath))) {
+                            mkdir(dirname($viewPath), 0777, true);
+                        }
+                        if (! file_exists($viewPath)) {
+                            file_put_contents($viewPath, '');
+                        }
+                    }
+
+                    if ($this->files->exists($viewPath = $path.'/'.$file)) {
+                        return $viewPath;
+                    }
+                }
+            }
+        }
+
         throw new InvalidArgumentException("View [$name] not found.");
     }
 
