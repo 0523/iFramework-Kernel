@@ -1458,6 +1458,13 @@ class Builder
      */
     protected function runSelect()
     {
+        /**
+         * 允许使用自定义函数 sql_select_cache 缓存查询
+         */
+        if (function_exists('sql_select_cache')) {
+            return sql_select_cache($this, ! $this->useWritePdo);
+        }
+
         return $this->connection->select($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
     }
 
