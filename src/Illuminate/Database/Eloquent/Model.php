@@ -566,6 +566,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function create(array $attributes = [])
     {
+        /**
+         * 修复有些时候 值为 '' PostgreSQL报错的问题
+         */
+        foreach ($attributes as $key => $value) {
+            if ($value === '') {
+                $attributes[$key] = null;
+            }
+        }
+        unset($key, $value);
+
         $model = new static($attributes);
 
         $model->save();
@@ -2659,9 +2669,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // If the "attribute" exists as a method on the model, we will just assume
         // it is a relationship and will load and return results from the query
         // and hydrate the relationship's value on the "relationships" array.
-        if (method_exists($this, $key)) {
-            return $this->getRelationshipFromMethod($key);
-        }
+
+        /**
+         * 方法不存在依然调用, 使魔术方法 __call 起作用
+         */
+        return $this->getRelationshipFromMethod($key);
     }
 
     /**
