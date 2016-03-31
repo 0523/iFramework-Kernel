@@ -1877,6 +1877,13 @@ class Builder
         // is the same type of result returned by the raw connection instance.
         $bindings = $this->cleanBindings($bindings);
 
+        /**
+         * 允许使用自定义函数 sql_before_insert
+         */
+        if (function_exists('sql_before_insert')) {
+            sql_before_insert($this, $sql, $bindings);
+        }
+
         return $this->connection->insert($sql, $bindings);
     }
 
