@@ -138,7 +138,7 @@ class FileViewFinder implements ViewFinderInterface
         /**
          * 开发模式,视图文件不存在时,会在首个视图目录自动创建视图文件
          */
-        if (env('APP_DEVELOP')) {
+        if (env('APP_ENV') == 'development') {
             foreach ((array)$paths as $path) {
                 foreach ($this->getPossibleViewFiles($name) as $file) {
                     if (! $this->files->exists($viewPath = $path.'/'.$file)) {
