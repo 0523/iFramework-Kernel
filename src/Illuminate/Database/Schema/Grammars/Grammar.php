@@ -93,7 +93,15 @@ abstract class Grammar extends BaseGrammar
 
         $onColumns = $this->columnize((array) $command->references);
 
-        $sql = "alter table {$table} add constraint {$index} ";
+        /**
+         * 设置外键名称
+         */
+        if (true) {
+            $fkName = 'fk_' . str_replace(['"', "'"], null, $columns) . '___' . str_replace('.', '_', $blueprint->getTable());
+            $sql = "alter table {$table} add constraint $fkName ";
+        } else {
+            $sql = "alter table {$table} add constraint {$index} ";
+        }
 
         $sql .= "foreign key ({$columns}) references {$on} ({$onColumns})";
 

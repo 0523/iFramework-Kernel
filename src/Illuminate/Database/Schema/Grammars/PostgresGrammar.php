@@ -87,7 +87,17 @@ class PostgresGrammar extends Grammar
     {
         $columns = $this->columnize($command->columns);
 
-        return 'alter table '.$this->wrapTable($blueprint)." add primary key ({$columns})";
+        /**
+         * uint
+         * 设置主键名称
+         * 填充率固定为100
+         */
+        if (true) {
+            $pkName = 'pk_' . str_replace('.', '_', $blueprint->getTable());
+            return 'alter table '.$this->wrapTable($blueprint)." add CONSTRAINT {$pkName} primary key ({$columns}) WITH (FILLFACTOR=100)";
+        } else {
+            return 'alter table '.$this->wrapTable($blueprint)." add primary key ({$columns})";
+        }
     }
 
     /**
@@ -101,11 +111,15 @@ class PostgresGrammar extends Grammar
     {
         $table = $this->wrapTable($blueprint);
 
-        $index = $this->wrap($command->index);
-
         $columns = $this->columnize($command->columns);
 
-        return "alter table $table add constraint {$index} unique ($columns)";
+        if (true) {
+            $ukName = 'unique_' . str_replace(['"', "'"], null, $columns) . '___' . str_replace('.', '_', $blueprint->getTable());
+            return "CREATE UNIQUE INDEX $ukName ON $table ($columns) WITH (FILLFACTOR=70)";
+        } else {
+            $index = $this->wrap($command->index);
+            return "alter table $table add constraint {$index} unique ($columns)";
+        }
     }
 
     /**
@@ -117,11 +131,61 @@ class PostgresGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
+        $table = $this->wrapTable($blueprint);
+
         $columns = $this->columnize($command->columns);
 
-        $index = $this->wrap($command->index);
+        if (true) {
+            $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '___' . str_replace('.', '_', $blueprint->getTable());
+            return "CREATE INDEX $ukName ON $table ($columns) WITH (FILLFACTOR=70)";
+        } else {
+            $index = $this->wrap($command->index);
 
-        return "create index {$index} on ".$this->wrapTable($blueprint)." ({$columns})";
+            return "create index {$index} on ".$this->wrapTable($blueprint)." ({$columns})";
+        }
+    }
+
+    /**
+     * 全小写索引
+     * 解决PostgreSQL大小写敏感问题
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexStringLower(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        if (true) {
+            $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '_lower___' . str_replace('.', '_', $blueprint->getTable());
+            return "CREATE INDEX $ukName ON $table (lower($columns)) WITH (FILLFACTOR=70)";
+        } else {
+            return "create index {$command->index} on ".$this->wrapTable($blueprint)." ({$columns})";
+        }
+    }
+
+    /**
+     * gin索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexGin(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        if (true) {
+            $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '___' . str_replace('.', '_', $blueprint->getTable());
+            return "CREATE INDEX $ukName ON $table USING gin ($columns)";
+        } else {
+            return "create index {$command->index} on ".$this->wrapTable($blueprint)." ({$columns})";
+        }
     }
 
     /**
@@ -145,7 +209,10 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
     {
-        return 'drop table if exists '.$this->wrapTable($blueprint);
+        /**
+         * 增加 CASCADE , 避免有外键等影响删除不掉
+         */
+        return 'drop table if exists '.$this->wrapTable($blueprint) . ' CASCADE';
     }
 
     /**
@@ -271,6 +338,61 @@ class PostgresGrammar extends Grammar
     protected function typeText(Fluent $column)
     {
         return 'text';
+    }
+
+    /**
+     * 创建 tsvector 类型字段
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTsvector(Fluent $column)
+    {
+        return 'tsvector';
+    }
+
+    /**
+     * 创建 interval 类型字段
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeInterval(Fluent $column)
+    {
+        return 'interval second';
+    }
+
+    /**
+     * 创建 intarray 类型字段
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeIntarray(Fluent $column)
+    {
+        return 'bigint[]';
+    }
+
+    /**
+     * 创建 strarray 类型字段
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeStrarray(Fluent $column)
+    {
+        return 'text[]';
+    }
+
+    /**
+     * 创建 ip 类型字段
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeIp(Fluent $column)
+    {
+        return 'cidr';
     }
 
     /**

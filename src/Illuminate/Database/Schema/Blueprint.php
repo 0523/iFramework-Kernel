@@ -362,6 +362,31 @@ class Blueprint
     }
 
     /**
+     * 全小写唯一索引
+     * 解决PostgreSQL大小写敏感问题
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function uniqueStringLower($columns, $name = null)
+    {
+        return $this->indexCommand('uniqueStringLower', $columns, $name);
+    }
+
+    /**
+     * gin唯一索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function uniqueGin($columns, $name = null)
+    {
+        return $this->indexCommand('uniqueGin', $columns, $name);
+    }
+
+    /**
      * Specify an index for the table.
      *
      * @param  string|array  $columns
@@ -371,6 +396,31 @@ class Blueprint
     public function index($columns, $name = null)
     {
         return $this->indexCommand('index', $columns, $name);
+    }
+
+    /**
+     * 全小写索引
+     * 解决PostgreSQL大小写敏感问题
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexStringLower($columns, $name = null)
+    {
+        return $this->indexCommand('indexStringLower', $columns, $name);
+    }
+
+    /**
+     * gin索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexGin($columns, $name = null)
+    {
+        return $this->indexCommand('indexGin', $columns, $name);
     }
 
     /**
@@ -462,6 +512,61 @@ class Blueprint
     public function text($column)
     {
         return $this->addColumn('text', $column);
+    }
+
+    /**
+     * 创建 tsvector 类型字段
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function tsvector($column)
+    {
+        return $this->addColumn('tsvector', $column);
+    }
+
+    /**
+     * 创建 interval 类型字段
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function interval($column)
+    {
+        return $this->addColumn('interval', $column);
+    }
+
+    /**
+     * 创建 intarray 类型字段
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function intarray($column)
+    {
+        return $this->addColumn('intarray', $column);
+    }
+
+    /**
+     * 创建 strarray 类型字段
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function strarray($column)
+    {
+        return $this->addColumn('strarray', $column);
+    }
+
+    /**
+     * 创建 ip 类型字段
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function ip($column)
+    {
+        return $this->addColumn('ip', $column);
     }
 
     /**
