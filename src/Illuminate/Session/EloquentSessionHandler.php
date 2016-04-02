@@ -147,7 +147,6 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
 
             // 用户登录次数 +1
             $user->login_times += 1;
-            $user->save();
 
             $session = [
                 'uint'          => $sessionPk,
@@ -159,10 +158,20 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
             ];
 
             $session['user_agent'] = strval($request->header('User-Agent'));
-            if ($request->ip()) {
-                $session['ip_address'] = strval($request->ip());
-                $session['ip_local'] = Gm\Api\QqWry::get_local($request->ip());
+            $session['ip_address'] = strval($request->ip());
+            $session['ip_local'] = Gm\Api\QqWry::get_local($request->ip());
+
+            $user->last_login_time = current_timestring();
+            $user->last_login_ip = $session['ip_address'];
+
+            if ($session['ip_local'] != $user->last_login_local) {
+                $session['local_change'] = true;
+                $user->last_login_local = $session['ip_local'];
+            } else {
+                $session['local_change'] = false;
             }
+
+            $user->save();
 
             if (! $this->exists) {
                 /**
