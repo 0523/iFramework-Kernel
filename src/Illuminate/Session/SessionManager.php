@@ -93,6 +93,18 @@ class SessionManager extends Manager
     }
 
     /**
+     * 新增 eloquent session 驱动
+     *
+     * @return \Illuminate\Session\Store
+     */
+    protected function createEloquentDriver()
+    {
+        $model = $this->app['config']['session.eloquent_model'];
+
+        return $this->buildSession(new EloquentSessionHandler($model));
+    }
+
+    /**
      * Get the database connection for the database driver.
      *
      * @return \Illuminate\Database\Connection

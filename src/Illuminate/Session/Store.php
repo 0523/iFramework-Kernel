@@ -124,7 +124,12 @@ class Store implements SessionInterface
         $data = $this->handler->read($this->getId());
 
         if ($data) {
-            $data = @unserialize($this->prepareForUnserialize($data));
+            /**
+             * 采用 eloquent 驱动, 数据不用进行序列化处理
+             */
+            if (config('session.driver') != 'eloquent') {
+                $data = @unserialize($this->prepareForUnserialize($data));
+            }
 
             if ($data !== false && $data !== null && is_array($data)) {
                 return $data;
@@ -184,6 +189,14 @@ class Store implements SessionInterface
      */
     public function isValidId($id)
     {
+        /**
+         * 采用 uuidai 生成id
+         */
+        if (function_exists('uuidai') and function_exists('is_uuidai')) {
+            // 也要校验是不是当天生成的
+            return is_uuidai($id) and (time() > 2999999999 or date('Ymd', substr(uuidtouint($id), 0, 10)) == date('Ymd'));
+        }
+
         return is_string($id) && preg_match('/^[a-f0-9]{40}$/', $id);
     }
 
@@ -194,6 +207,13 @@ class Store implements SessionInterface
      */
     protected function generateSessionId()
     {
+        /**
+         * 采用 uuidai 生成id
+         */
+        if (function_exists('uuidai') and function_exists('is_uuidai')) {
+            return uuidai();
+        }
+
         return sha1(uniqid('', true).Str::random(25).microtime(true));
     }
 
@@ -259,7 +279,16 @@ class Store implements SessionInterface
 
         $this->ageFlashData();
 
-        $this->handler->write($this->getId(), $this->prepareForStorage(serialize($this->attributes)));
+        /**
+         * 采用 eloquent 驱动, 数据不用进行序列化处理
+         */
+        if (config('session.driver') == 'eloquent') {
+            $data = $this->attributes;
+        } else {
+            $data = serialize($this->attributes);
+        }
+
+        $this->handler->write($this->getId(), $this->prepareForStorage($data));
 
         $this->started = false;
     }
