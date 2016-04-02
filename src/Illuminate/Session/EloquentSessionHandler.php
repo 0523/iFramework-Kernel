@@ -158,19 +158,10 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
                 'activity_long' => 1,
             ];
 
+            $session['user_agent'] = strval($request->header('User-Agent'));
             if ($request->ip()) {
                 $session['ip_address'] = strval($request->ip());
-                $session['user_agent'] = strval($request->header('User-Agent'));
-
-                // api_city_uint
-                $ipv4Loca = Gm\Api\Ipv4Loca::get_location($request->ip());
-                if ($ipv4Loca) {
-                    $country = Hm\Api\Coun::firstOrCreate(['name' => $ipv4Loca['country']]);
-                    $province = Hm\Api\Prov::firstOrCreate(['api_coun_uint' => $country->uint, 'name' => $ipv4Loca['province']]);
-                    $city = Hm\Api\City::firstOrCreate(['api_prov_uint' => $province->uint, 'name' => $ipv4Loca['city']]);
-
-                    $session['api_city_uint'] = $city->uint;
-                }
+                $session['ip_local'] = Gm\Api\QqWry::get_local($request->ip());
             }
 
             if (! $this->exists) {
