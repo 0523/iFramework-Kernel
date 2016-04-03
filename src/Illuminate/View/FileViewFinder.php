@@ -146,7 +146,11 @@ class FileViewFinder implements ViewFinderInterface
                             mkdir(dirname($viewPath), 0777, true);
                         }
                         if (! file_exists($viewPath)) {
-                            file_put_contents($viewPath, '');
+                            file_put_contents($viewPath, '@extends(\'layout.default\')
+
+@section(\'content\')
+@stop
+');
                         }
                     }
 
