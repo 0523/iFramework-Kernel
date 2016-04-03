@@ -209,6 +209,23 @@ class CacheManager implements FactoryContract
     }
 
     /**
+     * 新增 config 缓存驱动
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\DatabaseStore
+     */
+    protected function createConfigDriver(array $config)
+    {
+        $connection = $this->app['db']->connection(Arr::get($config, 'connection'));
+
+        return $this->repository(
+            new ConfigStore(
+                $connection, $config['table']
+            )
+        );
+    }
+
+    /**
      * Create a new cache repository with the given implementation.
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store

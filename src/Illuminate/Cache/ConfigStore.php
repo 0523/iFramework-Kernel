@@ -6,9 +6,8 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
-class DatabaseStore implements Store
+class ConfigStore implements Store
 {
     use RetrievesMultipleKeys;
 
@@ -20,13 +19,6 @@ class DatabaseStore implements Store
     protected $connection;
 
     /**
-     * The encrypter instance.
-     *
-     * @var \Illuminate\Contracts\Encryption\Encrypter
-     */
-    protected $encrypter;
-
-    /**
      * The name of the cache table.
      *
      * @var string
@@ -34,100 +26,84 @@ class DatabaseStore implements Store
     protected $table;
 
     /**
-     * A string that should be prepended to keys.
-     *
-     * @var string
-     */
-    protected $prefix;
-
-    /**
      * Create a new database store.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
-     * @param  string  $table
-     * @param  string  $prefix
+     * @param  \Illuminate\Database\ConnectionInterface $connection
+     * @param  string $table
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, EncrypterContract $encrypter, $table, $prefix = '')
+    public function __construct(ConnectionInterface $connection, $table)
     {
         $this->table = $table;
-        $this->prefix = $prefix;
-        $this->encrypter = $encrypter;
+
         $this->connection = $connection;
     }
 
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param  string|array $key
      * @return mixed
      */
     public function get($key)
     {
-        $prefixed = $this->prefix.$key;
-
-        $cache = $this->table()->where('key', '=', $prefixed)->first();
+        $cache = $this->table()->where('key', '=', $key)->first();
 
         // If we have a cache record we will check the expiration time against current
         // time on the system and see if the record has expired. If it has, we will
         // remove the records from the database table so it isn't returned again.
         if (! is_null($cache)) {
             if (is_array($cache)) {
-                $cache = (object) $cache;
+                $cache = (object)$cache;
             }
 
-            if (time() >= $cache->expiration) {
-                $this->forget($key);
-
-                return;
-            }
-
-            return $this->encrypter->decrypt($cache->value);
+            /**
+             * 加密方法由 encrypter 改为 json
+             */
+            return json_decode($cache->value, true);
         }
     }
 
     /**
      * Store an item in the cache for a given number of minutes.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int     $minutes
+     * @param  string $key
+     * @param  mixed $value
+     * @param  int $minutes
      * @return void
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $minutes = 5256000)
     {
-        $key = $this->prefix.$key;
-
         // All of the cached values in the database are encrypted in case this is used
         // as a session data store by the consumer. We'll also calculate the expire
         // time and place that on the table so we will check it on our retrieval.
-        $value = $this->encrypter->encrypt($value);
-
-        $expiration = $this->getTime() + ($minutes * 60);
+        /**
+         * 加密方法由 encrypter 改为 json
+         */
+        $value = json_encode($value);
 
         /**
          * 这种写法导致事物报错退出
          */
         // try {
-        //     $this->table()->insert(compact('key', 'value', 'expiration'));
+        //     $this->table()->insert(compact('key', 'value'));
         // } catch (Exception $e) {
-        //     $this->table()->where('key', '=', $key)->update(compact('value', 'expiration'));
+        //     $this->table()->where('key', '=', $key)->update(compact('value'));
         // }
 
         $data = $this->table()->where('key', '=', $key)->first();
         if (! $data) {
-            $this->table()->insert(compact('key', 'value', 'expiration'));
+            $this->table()->insert(compact('key', 'value'));
         } elseif ($data->value != $value) {
-            $this->table()->where('key', '=', $key)->update(compact('value', 'expiration'));
+            $this->table()->where('key', '=', $key)->update(compact('value'));
         }
     }
 
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param  string $key
+     * @param  mixed $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -140,8 +116,8 @@ class DatabaseStore implements Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param  string $key
+     * @param  mixed $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
@@ -154,35 +130,39 @@ class DatabaseStore implements Store
     /**
      * Increment or decrement an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  \Closure  $callback
+     * @param  string $key
+     * @param  mixed $value
+     * @param  \Closure $callback
      * @return int|bool
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
     {
         return $this->connection->transaction(function () use ($key, $value, $callback) {
-            $prefixed = $this->prefix.$key;
-
-            $cache = $this->table()->where('key', $prefixed)->lockForUpdate()->first();
+            $cache = $this->table()->where('key', $key)->lockForUpdate()->first();
 
             if (is_null($cache)) {
                 return false;
             }
 
             if (is_array($cache)) {
-                $cache = (object) $cache;
+                $cache = (object)$cache;
             }
 
-            $current = $this->encrypter->decrypt($cache->value);
+            /**
+             * 加密方法由 encrypter 改为 json
+             */
+            $current = json_decode($cache->value);
             $new = $callback($current, $value);
 
             if (! is_numeric($current)) {
                 return false;
             }
 
-            $this->table()->where('key', $prefixed)->update([
-                'value' => $this->encrypter->encrypt($new),
+            /**
+             * 加密方法由 encrypter 改为 json
+             */
+            $this->table()->where('key', $key)->update([
+                'value' => json_encode($new),
             ]);
 
             return $new;
@@ -202,8 +182,8 @@ class DatabaseStore implements Store
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param  string $key
+     * @param  mixed $value
      * @return void
      */
     public function forever($key, $value)
@@ -214,12 +194,12 @@ class DatabaseStore implements Store
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  string $key
      * @return bool
      */
     public function forget($key)
     {
-        $this->table()->where('key', '=', $this->prefix.$key)->delete();
+        $this->table()->where('key', '=', $key)->delete();
 
         return true;
     }
@@ -255,22 +235,12 @@ class DatabaseStore implements Store
     }
 
     /**
-     * Get the encrypter instance.
-     *
-     * @return \Illuminate\Contracts\Encryption\Encrypter
-     */
-    public function getEncrypter()
-    {
-        return $this->encrypter;
-    }
-
-    /**
      * Get the cache key prefix.
      *
      * @return string
      */
     public function getPrefix()
     {
-        return $this->prefix;
+        return null;
     }
 }
