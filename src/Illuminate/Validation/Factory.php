@@ -238,4 +238,18 @@ class Factory implements FactoryContract
     {
         $this->verifier = $presenceVerifier;
     }
+
+    /**
+     * 新增
+     * 获得扩展名称
+     *
+     * 使用方法:
+     * app('validator')->getExtensionKeys()
+     *
+     * @return array
+     */
+    public function getExtensionKeys()
+    {
+        return array_keys($this->extensions);
+    }
 }
