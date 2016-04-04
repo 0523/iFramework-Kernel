@@ -372,7 +372,16 @@ if (! function_exists('env')) {
      */
     function env($key, $default = null)
     {
-        $value = getenv($key);
+        /**
+         * 修复有时获取不到的bug
+         * @see Dotenv\Loader::setEnvironmentVariable
+         * @see Dotenv\Loader::getEnvironmentVariable
+         */
+        if (array_key_exists($key, $_ENV)) {
+            return $_ENV[$key];
+        } else {
+            $value = getenv($key);
+        }
 
         if ($value === false) {
             return value($default);
