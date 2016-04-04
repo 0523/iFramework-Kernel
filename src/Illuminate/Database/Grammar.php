@@ -95,15 +95,6 @@ abstract class Grammar
             return $value;
         }
 
-        /**
-         * 支持 PostgreSQL 的一些个性化查询, 例如:json属性的查询等
-         * 示例:
-         * where('@"jsonb"->>\'name\'', '张三')
-         */
-        if (starts_with($value, '@') and function_exists('str_replace_once')) {
-            return str_replace_once('@', null, $value);
-        }
-
         return '"'.str_replace('"', '""', $value).'"';
     }
 
