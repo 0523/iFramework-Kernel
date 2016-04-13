@@ -178,9 +178,12 @@ class StartSession
         }
 
         if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
+            /**
+             * 增加参数避免仅http
+             */
             $response->headers->setCookie(new Cookie(
                 $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
-                $config['path'], $config['domain'], Arr::get($config, 'secure', false)
+                $config['path'], $config['domain'], Arr::get($config, 'secure', false), false
             ));
         }
     }
