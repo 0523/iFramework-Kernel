@@ -378,13 +378,13 @@ if (! function_exists('env')) {
          * @see Dotenv\Loader::getEnvironmentVariable
          */
         if (array_key_exists($key, $_ENV)) {
-            return $_ENV[$key];
+            $value = $_ENV[$key];
         } else {
             $value = getenv($key);
-        }
 
-        if ($value === false) {
-            return value($default);
+            if ($value === false) {
+                return value($default);
+            }
         }
 
         switch (strtolower($value)) {
