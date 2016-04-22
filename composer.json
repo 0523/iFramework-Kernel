@@ -3,6 +3,12 @@
     "description": "The iFramework Kernel",
     "keywords": ["iframework", "kernel"],
     "license": "MIT",
+    "repositories": {
+        "symfony/debug": {
+            "type": "vcs",
+            "url": "https://github.com/0523/symfony-debug"
+        }
+    },
     "homepage": "https://github.com/0523/iFramework-Kernel",
     "support": {
         "issues": "https://github.com/0523/iFramework-Kernel/issues",
