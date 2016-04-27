@@ -2701,6 +2701,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $relations = $this->$method();
 
+        /**
+         * 这里可能是 未设置该列的值 而返回的 null
+         */
+        if (is_null($relations)) {
+            return null;
+        }
+
         if (! $relations instanceof Relation) {
             throw new LogicException('Relationship method must return an object of type '
                 .'Illuminate\Database\Eloquent\Relations\Relation');
