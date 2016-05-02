@@ -195,6 +195,36 @@ class Builder
         'rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
         'not similar to',
+
+        /**
+         * 增加操作符:数组
+         * @see http://www.postgres.cn/docs/9.3/functions-array.html
+         */
+        '@>', '<@', '&&', '||',
+
+        /**
+         * 增加操作符:JSON
+         * @see http://www.postgres.cn/docs/9.3/functions-json.html
+         */
+        '->', '->>', '#>', '#>>',
+
+        /**
+         * 增加操作符:文本检索
+         * @see http://www.postgres.cn/docs/9.3/functions-textsearch.html
+         */
+        '@@', '!!',
+
+        /**
+         * 增加操作符:网络地址
+         * @see http://www.postgres.cn/docs/9.3/functions-net.html
+         */
+        '<<=', '>>=', '+', '-',
+
+        /**
+         * 增加操作符:时间/日期
+         * @see http://www.postgres.cn/docs/9.3/functions-datetime.html
+         */
+        '*', '/',
     ];
 
     /**
