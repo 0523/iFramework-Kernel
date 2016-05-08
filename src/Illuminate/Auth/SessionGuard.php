@@ -482,11 +482,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->session->migrate(true);
 
         /**
-         * 更新用户登录信息
+         * 更新账号登录信息
          */
         $user = $this->user;
-        if ($user and method_exists($this->session->getHandler(), 'update_login_info')) {
-            $this->session->getHandler()->update_login_info($this->getRequest(), $this->session->getId(), $user);
+        if ($user and method_exists($this->session->getHandler(), 'updateLoginInfo')) {
+            $this->session->getHandler()->updateLoginInfo($this->getRequest(), $this->session->getId(), $user);
         }
     }
 

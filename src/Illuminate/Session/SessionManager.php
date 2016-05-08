@@ -99,9 +99,7 @@ class SessionManager extends Manager
      */
     protected function createEloquentDriver()
     {
-        $model = $this->app['config']['session.eloquent_model'];
-
-        return $this->buildSession(new EloquentSessionHandler($model));
+        return $this->buildSession(new EloquentSessionHandler());
     }
 
     /**

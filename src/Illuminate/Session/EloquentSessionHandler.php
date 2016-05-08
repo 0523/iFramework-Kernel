@@ -7,18 +7,10 @@ namespace Illuminate\Session;
 
 use SessionHandlerInterface;
 
-use Gm;
 use Hm;
 
 class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
 {
-    /**
-     * The name of the session model.
-     *
-     * @var string
-     */
-    protected $model;
-
     /**
      * The existence state of the session.
      *
@@ -27,25 +19,16 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     protected $exists;
 
     /**
-     * 登入时间
-     *
-     * @var bool
-     */
-    protected $login_time;
-
-    /**
      * Create a new database session handler instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
      * @return mixed
      */
-    public function __construct($model)
+    public function __construct()
     {
         if (env('APP_ENV') == 'development') {
-            new $model();
+            new Hm\Sys\Brow();
+            new Hm\Sys\Sess();
         }
-
-        $this->model = $model;
     }
 
     /**
@@ -72,8 +55,7 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         $sessionPk = uuidtouint($sessionId);
 
         if ($sessionPk) {
-            $model = $this->model;
-            $session = $model::find($sessionPk);
+            $session = Hm\Sys\Sess::find($sessionPk);
             if ($session) {
                 $this->exists = true;
 
@@ -110,15 +92,13 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
                 $this->read($sessionId);
             }
 
-            $model = $this->model;
-
             if ($this->exists) {
-                $model::where('uint', $sessionPk)->update($session);
+                Hm\Sys\Sess::where('uint', $sessionPk)->update($session);
             } else {
                 if (current_browser_uuid()) {
-                    $brow = Hm\Api\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
-                    $session['api_brow_uint'] = $brow->uint;
-                    $model::create($session);
+                    $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
+                    $session['sys_brow_uint'] = $Brow->uint;
+                    Hm\Sys\Sess::create($session);
                 }
             }
 
@@ -129,88 +109,87 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     }
 
     /**
-     * update_login_info
+     * updateLoginInfo
      *
-     * 更新登录信息, 用户登录成功之后触发
+     * 更新账号信息, 账号登录成功之后触发
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param string $sessionId
-     * @param object $user
+     * @param object $Acc
      *
      * @return mixed
      */
-    public function update_login_info($request, $sessionId, $user)
+    public function updateLoginInfo($request, $sessionId, $Acc)
     {
-        if ($user) {
-            $model = $this->model;
+        if ($Acc) {
             $sessionPk = uuidtouint($sessionId);
 
-            // 用户登录次数 +1
-            $user->login_times += 1;
+            // 账号登录次数 +1
+            $Acc->login_times += 1;
 
             $session = [
                 'uint'          => $sessionPk,
                 'last_activity' => time(),
-                'user_id'       => $user->getAuthIdentifier(),
-                'login_times'   => $user->login_times,
+                'sys_acc_uint'  => $Acc->getAuthIdentifier(),
+                'login_times'   => $Acc->login_times,
                 'login_time'    => current_timestring(),
                 'activity_long' => 1,
             ];
 
             $session['user_agent'] = strval($request->header('User-Agent'));
             $session['ip_address'] = strval($request->ip());
-            $session['ip_local'] = Gm\Api\QqWry::get_local($request->ip());
+            $session['ip_local'] = Hm\Api\QqWry::getLocal($request->ip());
 
-            $user->last_login_time = current_timestring();
-            $user->last_login_ip = $session['ip_address'];
+            $Acc->last_login_time = current_timestring();
+            $Acc->last_login_ip = $session['ip_address'];
 
-            if ($session['ip_local'] != $user->last_login_local) {
+            if ($session['ip_local'] != $Acc->last_login_local) {
                 $session['local_change'] = true;
-                $user->last_login_local = $session['ip_local'];
+                $Acc->last_login_local = $session['ip_local'];
             } else {
                 $session['local_change'] = false;
             }
 
-            $user->save();
+            $Acc->save();
 
             if (! $this->exists) {
                 /**
                  * 实测 是不存在的!!!
                  */
                 if (current_browser_uuid()) {
-                    $brow = Hm\Api\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
-                    $session['apis_browsers_uint'] = $brow->uint;
-                    $model::create($session);
+                    $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
+                    $session['sys_brow_uint'] = $Brow->uint;
+                    Hm\Sys\Sess::create($session);
                     $this->exists = true;
                 }
             } else {
-                $model::where('uint', $sessionPk)->update($session);
+                Hm\Sys\Sess::where('uint', $sessionPk)->update($session);
             }
 
             // 浏览器的 系统 引擎 核心
             do {
-                (isset($brow) and is_object($brow)) or $brow = Hm\Api\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
+                (isset($Brow) and is_object($Brow)) or $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
 
-                if ($brow) {
+                if ($Brow) {
                     $update = 0;
 
-                    if (! isset($brow->os) or $brow->os === null) {
-                        $brow->os = $request->input('os');
+                    if (! isset($Brow->os) or $Brow->os === null) {
+                        $Brow->os = $request->input('os');
                         $update++;
                     }
 
-                    if (! isset($brow->engine) or $brow->engine === null) {
-                        $brow->engine = $request->input('engine');
+                    if (! isset($Brow->engine) or $Brow->engine === null) {
+                        $Brow->engine = $request->input('engine');
                         $update++;
                     }
 
-                    if (! isset($brow->browser) or $brow->browser === null) {
-                        $brow->browser = $request->input('browser');
+                    if (! isset($Brow->browser) or $Brow->browser === null) {
+                        $Brow->browser = $request->input('browser');
                         $update++;
                     }
 
                     if ($update) {
-                        $brow->save();
+                        $Brow->save();
                     }
                 }
             } while (0);
@@ -225,20 +204,19 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         $sessionPk = uuidtouint($sessionId);
 
         if ($sessionPk) {
-            $model = $this->model;
             /*
-             * user_id 为空 ,表示是未登录的会话数据
+             * sys_acc_uint 为空 ,表示是未登录的会话数据
              * 可以销毁
              */
-            $model::where('uint', $sessionPk)->whereNull('user_id')->delete();
-
-            /*
-             * user_id 非空
-             * 可以清空 data
-             */
-            $model::where('uint', $sessionPk)->update([
-                'data' => null,
-            ]);
+            if (! Hm\Sys\Sess::where('uint', $sessionPk)->whereNull('sys_acc_uint')->delete()) {
+                /*
+                 * user_id 非空
+                 * 可以清空 data
+                 */
+                Hm\Sys\Sess::where('uint', $sessionPk)->update([
+                    'data' => null,
+                ]);
+            }
         }
 
         return true;
@@ -250,17 +228,16 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     public function gc($lifetime)
     {
         /**
-         * user_id 为空 ,表示是未登录的会话数据
+         * sys_acc_uint 为空 ,表示是未登录的会话数据
          * 可以清理
          */
-        $model = $this->model;
-        $model::where('last_activity', '<=', time() - $lifetime)->whereNull('user_id')->delete();
+        Hm\Sys\Sess::where('last_activity', '<=', time() - $lifetime)->whereNull('sys_acc_uint')->delete();
 
         /**
          * user_id 非空
          * 可以清空 data
          */
-        $model::where('last_activity', '<=', time() - $lifetime)->update([
+        Hm\Sys\Sess::where('last_activity', '<=', time() - $lifetime)->update([
             'data' => null,
         ]);
 
