@@ -424,6 +424,126 @@ class Blueprint
     }
 
     /**
+     * cn_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexCnClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexCnClean', $columns, $name);
+    }
+
+    /**
+     * en_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexEnClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexEnClean', $columns, $name);
+    }
+
+    /**
+     * ja_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexJaClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexJaClean', $columns, $name);
+    }
+
+    /**
+     * ko_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexKoClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexKoClean', $columns, $name);
+    }
+
+    /**
+     * de_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexDeClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexDeClean', $columns, $name);
+    }
+
+    /**
+     * fr_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexFrClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexFrClean', $columns, $name);
+    }
+
+    /**
+     * ru_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexRuClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexRuClean', $columns, $name);
+    }
+
+    /**
+     * es_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexEsClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexEsClean', $columns, $name);
+    }
+
+    /**
+     * it_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexItClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexItClean', $columns, $name);
+    }
+
+    /**
+     * pt_clean 索引
+     *
+     * @param  string|array  $columns
+     * @param  string  $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function indexPtClean($columns, $name = null)
+    {
+        return $this->indexCommand('indexPtClean', $columns, $name);
+    }
+
+    /**
      * Specify a foreign key for the table.
      *
      * @param  string|array  $columns
@@ -526,36 +646,36 @@ class Blueprint
     }
 
     /**
-     * 创建 interval 类型字段
+     * 创建 dateDiff 类型字段
      *
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function interval($column)
+    public function dateDiff($column)
     {
-        return $this->addColumn('interval', $column);
+        return $this->addColumn('dateDiff', $column);
     }
 
     /**
-     * 创建 intarray 类型字段
+     * 创建 intarr 类型字段
      *
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function intarray($column)
+    public function intarr($column)
     {
-        return $this->addColumn('intarray', $column);
+        return $this->addColumn('intarr', $column);
     }
 
     /**
-     * 创建 strarray 类型字段
+     * 创建 textarr 类型字段
      *
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function strarray($column)
+    public function textarr($column)
     {
-        return $this->addColumn('strarray', $column);
+        return $this->addColumn('textarr', $column);
     }
 
     /**

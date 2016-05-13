@@ -95,8 +95,8 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
             if ($this->exists) {
                 Hm\Sys\Sess::where('uint', $sessionPk)->update($session);
             } else {
-                if (current_browser_uuid()) {
-                    $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
+                if (browser_uuid()) {
+                    $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(browser_uuid())]);
                     $session['sys_brow_uint'] = $Brow->uint;
                     Hm\Sys\Sess::create($session);
                 }
@@ -156,8 +156,8 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
                 /**
                  * 实测 是不存在的!!!
                  */
-                if (current_browser_uuid()) {
-                    $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
+                if (browser_uuid()) {
+                    $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(browser_uuid())]);
                     $session['sys_brow_uint'] = $Brow->uint;
                     Hm\Sys\Sess::create($session);
                     $this->exists = true;
@@ -168,7 +168,7 @@ class EloquentSessionHandler implements SessionHandlerInterface, ExistenceAwareI
 
             // 浏览器的 系统 引擎 核心
             do {
-                (isset($Brow) and is_object($Brow)) or $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(current_browser_uuid())]);
+                (isset($Brow) and is_object($Brow)) or $Brow = Hm\Sys\Brow::firstOrCreate(['uint' => uuidtouint(browser_uuid())]);
 
                 if ($Brow) {
                     $update = 0;

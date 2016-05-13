@@ -1489,10 +1489,10 @@ class Builder
     protected function runSelect()
     {
         /**
-         * 允许使用自定义函数 sql_select_cache 缓存查询
+         * 允许使用自定义函数 qr_select 缓存查询
          */
-        if (function_exists('sql_select_cache')) {
-            return sql_select_cache($this, ! $this->useWritePdo);
+        if (function_exists('qr_select')) {
+            return qr_select($this, ! $this->useWritePdo);
         }
 
         return $this->connection->select($this->toSql(), $this->getBindings(), ! $this->useWritePdo);
@@ -1908,10 +1908,10 @@ class Builder
         $bindings = $this->cleanBindings($bindings);
 
         /**
-         * 允许使用自定义函数 sql_before_insert
+         * 允许使用自定义函数 qe_beforeinsert
          */
-        if (function_exists('sql_before_insert')) {
-            sql_before_insert($this, $sql, $bindings);
+        if (function_exists('qe_beforeinsert')) {
+            qe_beforeinsert($this, $sql, $bindings);
         }
 
         return $this->connection->insert($sql, $bindings);
@@ -1946,10 +1946,10 @@ class Builder
         $sql = $this->grammar->compileUpdate($this, $values);
 
         /**
-         * 允许使用自定义函数 sql_before_update
+         * 允许使用自定义函数 qe_beforeupdate
          */
-        if (function_exists('sql_before_update')) {
-            sql_before_update($this, $sql, $bindings);
+        if (function_exists('qe_beforeupdate')) {
+            qe_beforeupdate($this, $sql, $bindings);
         }
 
         return $this->connection->update($sql, $this->cleanBindings($bindings));

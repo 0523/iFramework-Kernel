@@ -7,7 +7,7 @@ use Exception;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
 
-class ConfigStore implements Store
+class ConfStore implements Store
 {
     use RetrievesMultipleKeys;
 
@@ -211,7 +211,8 @@ class ConfigStore implements Store
      */
     public function flush()
     {
-        $this->table()->delete();
+        // $this->table()->delete();
+        return;
     }
 
     /**

@@ -189,6 +189,176 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * cn_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexCnClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__cn_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'cn_clean' as text))";
+    }
+
+    /**
+     * en_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexEnClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__en_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'en_clean' as text))";
+    }
+
+    /**
+     * ja_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexJaClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__ja_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'ja_clean' as text))";
+    }
+
+    /**
+     * ko_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexKoClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__ko_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'ko_clean' as text))";
+    }
+
+    /**
+     * de_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexDeClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__de_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'de_clean' as text))";
+    }
+
+    /**
+     * fr_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexFrClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__fr_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'fr_clean' as text))";
+    }
+
+    /**
+     * ru_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexRuClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__ru_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'ru_clean' as text))";
+    }
+
+    /**
+     * es_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexEsClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__es_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'es_clean' as text))";
+    }
+
+    /**
+     * it_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexItClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__it_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'it_clean' as text))";
+    }
+
+    /**
+     * pt_clean 索引
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileIndexPtClean(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $this->wrapTable($blueprint);
+
+        $columns = $this->columnize($command->columns);
+
+        $ukName = 'index_' . str_replace(['"', "'"], null, $columns) . '__pt_clean___' . str_replace('.', '_', $blueprint->getTable());
+        return "CREATE INDEX $ukName ON $table USING btree (cast ($columns->>'pt_clean' as text))";
+    }
+
+    /**
      * Compile a drop table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -352,34 +522,34 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * 创建 interval 类型字段
+     * 创建 dateDiff 类型字段
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-    protected function typeInterval(Fluent $column)
+    protected function typeDateDiff(Fluent $column)
     {
         return 'interval second';
     }
 
     /**
-     * 创建 intarray 类型字段
+     * 创建 intarr 类型字段
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-    protected function typeIntarray(Fluent $column)
+    protected function typeIntarr(Fluent $column)
     {
         return 'bigint[]';
     }
 
     /**
-     * 创建 strarray 类型字段
+     * 创建 textarr 类型字段
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-    protected function typeStrarray(Fluent $column)
+    protected function typeTextarr(Fluent $column)
     {
         return 'text[]';
     }
